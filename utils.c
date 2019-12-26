@@ -42,14 +42,14 @@ int arret(int i){
 
     if (genereRandom(0,99) > 80)  {
         voitures[i].nbrStand ++;
-        tempsArrete += (genereRandom(24,44)/10,0);
+        tempsArrete += (genereRandom(1,4));
     }
     return tempsArrete;
 }
 
-void crash(int index){
-    if (genereRandom(0,999) > 998){
-        voitures[index].isOut = 1;
+void crash(int i){
+    if (genereRandom(0,999) > 995){
+        voitures[i].isOut = 1;
     }
 }
 
@@ -63,24 +63,6 @@ double getTemps() {
     return temps;
 }
 
-int nbrTour(int km){
-    int nbr = 5;			// Le nombre de tours par défaut
-    int longueurMinCourse = 50;	// longueur minimale pour une course
-    if(km == 0)  //si l'utilisateur n'entre pas de paramètre pour les kilomètres
-    {
-        return nbr;
-    }
-    if(longueurMinCourse % km == 0)
-    {
-        nbr = longueurMinCourse/km;
-    }
-    else
-    {
-        nbr = 1 + (longueurMinCourse/km);
-    }
-    return nbr;
-}
-
 int indexOf(int i, int longueur, int t[])
 {
     for(int j=0; j<longueur; j++)
@@ -90,16 +72,15 @@ int indexOf(int i, int longueur, int t[])
             return j;
         }
     }
-    //si le pid n'est pas dans l'onglet, nous renvoyons la longueur de l'onglet pour permettre la détection d'erreur
     return longueur;
 }
 
-int isIn(int nom, int longueur, structTuture t[])
+int isIn(int nom, int longueur, structCar t[])
 {
-    int k=0;
-    for(int j=0; j<longueur; j++)
+    int k = 0;
+    for(int i=0; i<longueur; i++)
     {
-        if(nom==t[j].nom)
+        if(nom==t[i].nom)
         {
             k=1;
             break;
@@ -281,7 +262,7 @@ void setOut(int q)
     {
         for(int i=0; i<20; i++)
         {
-            int j = isIn(voitures[i].nbr, 15, qualifiedFor2);
+            int j = isIn(voitures[i].nombre, 15, qualifiedFor2);
             //si la voiture n'est pas dans voituresQuelif2, nous la disqualifions
             if(j==0)
             {
@@ -293,7 +274,7 @@ void setOut(int q)
     {
         for(int i=0; i<20; i++)
         {
-            int j = isIn(voitures[i].nbr, 10, qualifiedFor3);
+            int j = isIn(voitures[i].nombre, 10, qualifiedFor3);
             //si la voiture n'est pas dans voituresQuelif3, nous la disqualifions
             if(j==0)
             {

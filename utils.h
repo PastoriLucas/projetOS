@@ -98,22 +98,14 @@ int arret(int i);
  * @pre : 0 <= index <= |voitures|
  * @post : returns 1 si crash, 0 otherwise
  */
-void crash(int index);
+void crash(int i);
 
 /*
  * Cette fonction obtient le temps maximum actuel des voitures
  * @pre : structTuture *voitures exists
  * @post : returns le max de temps actuelle des voitures
  */
-double getCurrTemps();
-
-/*
- * Cette fonction calcule le nombre de tours requis pour cette piste. Ce nombre est le plus petit nombre de tours de manière à ce que
- * les kilomètres parcourus soient> = 305 km.
- * @pre : km > 0
- * @post : returns x = 305/km if km%2==0|| x=1+305/km
- */
-int nbrTour(int km);
+double getTemps();
 
 /*
  * Cette fonction fait correspondre l'index du processus (dans pidList) à un index dans les voitures. i est la pidList à comparer,
