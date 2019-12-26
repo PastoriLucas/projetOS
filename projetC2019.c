@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
@@ -86,8 +86,6 @@ int genererP1(int i) {
 	
 int principal(int nbrVoitures) {
     int pid;
-	int essaiF = 0;
-	int essaiP = 0;
 	for(int x=0; x<nbrVoitures; x++) {
 		pid = fork();
 		if (pid < 0) {
@@ -106,13 +104,19 @@ int principal(int nbrVoitures) {
 			return 0;
 		}
 		else if(pid > 0) {
-		    semop(SemId, &semWait2, 1);
+			semop(SemId, &semWait2, 1);
 			semop(SemId, &semDo2, 1);
 			listePid[21-(x+1)] = pid;
 			semop(SemId, &semPost2, 1);
 		}
 	}
-}	
+	for(int k=0; k<20; k++) {
+		semop(SemId, &semWait2, 1);
+		semop(SemId, &semDo2, 1);
+		printf("%d\n", listePid[k]);
+		semop(SemId, &semPost2, 1);
+	}
+}
 	
 	
 int main() {
