@@ -1,4 +1,4 @@
-#ifndef voiture.h
+#ifndef _VOITURE_H
 #define _VOITURE_H
 
 typedef struct structCar {
