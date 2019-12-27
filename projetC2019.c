@@ -73,15 +73,11 @@ int principal(int nbrVoitures) {
 	while(brain[0]!=20) {
 	sleep(0.50);
 	}
-	/* semop(SemId, &semWait1, 1);
-	semop(SemId, &semDo1, 1);
-	printf("%d\n", brain[7]);
-	semop(SemId, &semPost1, 1); */
 	printf("%s\n\n", "S1 :");
 	for(int i=0; i<20;i++) {
-		printf("%.2f\n", voitures[i].bestS1);
+		printf("%.2f%s", voitures[i].bestS1, "   ");
 	}
-	printf("%s%.2f\n", "Best time : ", brain[7]);
+	printf("\n%s%.2f\n", "Best time : ", brain[7]);
 	printf("\n%s\n\n", "S2 :");
 }
 	
@@ -178,6 +174,6 @@ int main() {
 	
 	
 	
-	
+	calculerTempsMax(2);
 	principal(20);
 }

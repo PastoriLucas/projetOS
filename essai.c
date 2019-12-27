@@ -9,10 +9,10 @@
 int genererEssai(int essai, int numPid) {
 	int tempsTotalEssai;
 	if(essai == 1 || essai == 2) {
-		tempsTotalEssai = 300; //Normalement 5400 (1h30)
+		tempsTotalEssai = 200; //Normalement 5400 (1h30)
 	}
 	if(essai == 3) {
-		tempsTotalEssai = 200; //Normalement 3600 (1h00)
+		tempsTotalEssai = 100; //Normalement 3600 (1h00)
 	}
 	//while(voitures[numPid].isOut == 0 && voitures[numPid].tempsTotal < tempsTotalEssai) {
 		

@@ -15,7 +15,14 @@ structCar *qualifiedFor3;
 int indexOf(int i, int longueur, int t[]);
 void killIt();
 int startPosition;
-int tempsMaxCircuit;
+
+int tempsMinS1;
+int tempsMaxS1;
+int tempsMinS2;
+int tempsMaxS2;
+int tempsMinS3;
+int tempsMaxS3;
+
 int calculerTempsMax(int tailleCircuit);
 void tempsS1(int i);
 void tempsS2(int i);

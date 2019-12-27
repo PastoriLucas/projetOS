@@ -63,9 +63,15 @@ double getTemps() {
     return temps;
 }
 
-int calculerTempsMax(int tailleCircuit){	
-		int tempsMaxParKm = 20;
-		tempsMaxCircuit = tempsMaxParKm * tailleCircuit;
+int calculerTempsMax(int tailleCircuit){
+		int tempsMinParKm = 60;
+		int tempsMaxParKm = 90;
+		tempsMinS1 = (tempsMinParKm * tailleCircuit)/4;
+		tempsMaxS1 = (tempsMaxParKm * tailleCircuit)/4;
+		tempsMinS2 = 45*(tempsMinParKm * tailleCircuit)/100;
+		tempsMaxS2 = 45*(tempsMaxParKm * tailleCircuit)/100;
+		tempsMinS3 = 3*(tempsMinParKm * tailleCircuit)/10;
+		tempsMaxS3 = 3*(tempsMaxParKm * tailleCircuit)/10;
 }
 
 int indexOf(int i, int longueur, int t[])
@@ -99,10 +105,9 @@ int isIn(int nom, int longueur, structCar t[])
 void tempsS1(int i) {
     semop(SemId, &semWait0, 1);
     semop(SemId, &semDo0, 1);
-	
 	voitures[i].tempsTour = 0.0;
     double temps;
-	double tempsRandom = genereRandom(20,28);
+	double tempsRandom = genereRandom(tempsMinS1,tempsMaxS1);
 
 	//crash(i);
     

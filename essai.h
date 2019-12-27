@@ -7,7 +7,7 @@
 #include "cars.h"
 int genererEssai(int i, int numPid);
 
-void genereRecapEntrainementFile();
+//void genereRecapEntrainementFile();
 
 
 #endif
