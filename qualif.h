@@ -1,21 +1,21 @@
 #ifndef qualification_h
 #define qualification_h
 
-#include "voiture.h"
+#include "cars.h"
 
 /*
  * Trie la table de voitures du base de bestCircuit
  * @pre : voituresQualif not null, sizeArrayCars==20 || sizeArrayCars==15 || sizeArrayCars==10
  * @post : modification de voituresQualif
  */
-void triVoitures(structCar voituresQualif[], int sizeArrayCar);
+void triVoitures(structCar, carQualif[], int sizeArrayCar);
 
 /*
  * Construction de la grille de départ
  * @pre : voituresQualif not null, q==1 || q==2 || q==3
  * @post : modification de la var startPosition
  */
-void startingBlock(structCar voituresQualif[], int q);
+//void startingBlock(structCar voituresQualif[], int q);
 
 /*
  * Lance la qualif sur une voiture

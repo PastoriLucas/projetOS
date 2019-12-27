@@ -1,4 +1,4 @@
-#include "cars.h.h"
+#include "cars.h"
 #include "utils.h"
 #include "qualif.h"
 #include <stdio.h>
@@ -21,7 +21,7 @@ void triVoitures(structCar carQualif[], int sizeArrayCar)
         for(j = i+1; j < sizeArrayCar; j++)
             //Vérifie s'il n'y a pas de nb plus petits dans le cas suivant   PQ
         {
-            if(voituresQualif[j].bestTour < carQualif[i].bestTour)
+            if(carQualif[j].bestTour < carQualif[i].bestTour)
             {
                 //Si vrai, switch les nombres
                 tempsCar = carQualif[i];
@@ -32,7 +32,7 @@ void triVoitures(structCar carQualif[], int sizeArrayCar)
     }
 }
 
-void startingBlock(structCar carQualif, int q){
+/* void startingBlock(structCar carQualif[], int q){
     int conservee = 0;
     int startArray = 0;
     int conservee2 = 0;
@@ -69,13 +69,13 @@ void startingBlock(structCar carQualif, int q){
             qualifiedFor3[i] = carQualif[i];
         }
     }
-}
+} 
 
 void qualif(int index, int q){
-    id_sem = semop(id_sem, &semWait, 1);
-    id_sem = semop(id_sem, &semDo, 1);
+    semop(SemId, &semWait0, 1);
+    semop(SemId, &semDo0, 1);
     double temps = getCurrTemps();
-    id_sem = semop(id_sem, &semPost, 1);
+    semop(SemId, &semPost0, 1);
     double tempsQualif = 0.0;
 
     //determine la durée de l'essai
@@ -98,46 +98,46 @@ void qualif(int index, int q){
         genereTempsS1(index);
 
         //si la voiture a un meilleur temps pour S1 que toutes les autres, mise à jour de la variable globale
-        if(voitures[index].bestS1<smv[7])
+        if(voitures[index].bestS1<shMem[7])
         {
-            id_sem = semop(id_sem, &semWait1, 1);
-            id_sem = semop(id_sem, &semDo1, 1);
+            semop(SemId, &semWait1, 1);
+            semop(SemId, &semDo1, 1);
             smv[7] = voitures[index].bestS1;
-            id_sem = semop(id_sem, &semPost1, 1);
+            semop(SemId, &semPost1, 1);
         }
         genereTempsS2(index);
 
         //si la voiture a un meilleur temps pour S2 que toutes les autres, mise à jour de la variable globale
         if(voitures[index].bestS2<smv[8])
         {
-            id_sem = semop(id_sem, &semWait1, 1);
-            id_sem = semop(id_sem, &semDo1, 1);
+            semop(SemId, &semWait1, 1);
+            semop(SemId, &semDo1, 1);
             smv[8] = voitures[index].bestS2;
-            id_sem = semop(id_sem, &semPost1, 1);
+            semop(SemId, &semPost1, 1);
         }
         genereTempsS3(index);
 
         //si la voiture a un meilleur temps pour S3 que toutes les autres, mise à jour de la variable globale
         if(voitures[index].bestS3<smv[9])
         {
-            id_sem = semop(id_sem, &semWait1, 1);
-            id_sem = semop(id_sem, &semDo1, 1);
+            semop(SemId, &semWait1, 1);
+            semop(SemId, &semDo1, 1);
             smv[9] = voitures[index].bestS3;
-            id_sem = semop(id_sem, &semPost1, 1);
+            semop(SemId, &semPost1, 1);
         }
         //si la voiture a un meilleur temps du circuit que toutes les autres, mise à jour de la variable globale
         if(voitures[index].bestTour<smv[10])
         {
-            id_sem = semop(id_sem, &semWait1, 1);
-            id_sem = semop(id_sem, &semDo1, 1);
-            smv[10] = voitures[index].bestTour;
-            id_sem = semop(id_sem, &semPost1, 1);
+            semop(SemId, &semWait1, 1);
+            semop(SemId, &semDo1, 1);
+            shMem[10] = voitures[index].bestTour;
+            semop(SemId, &semPost1, 1);
         }
         // mise à jour de l'heure actuelle de la course
-        id_sem = semop(id_sem, &semWait, 1);
-        id_sem = semop(id_sem, &semDo, 1);
+        semop(SemId, &semWait, 1);
+        semop(SemId, &semDo, 1);
         temps = getTemps();
-        id_sem = semop(id_sem, &semPost, 1);
+        semop(SemId, &semPost, 1);
     }
     //Ici, mise à jour de la valeur de smv [3], [4] ou [5],
     //indique au processus parent que la voiture a terminé son cycle de qualification.
@@ -200,4 +200,4 @@ void genereRecapQualifFile()
         reset(i);
     }
 }
-
+*/

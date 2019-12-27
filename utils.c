@@ -33,12 +33,11 @@ struct sembuf semDo2 = {2,1,SEM_UNDO|IPC_NOWAIT};
 struct sembuf semPost2 = {2,-1,SEM_UNDO|IPC_NOWAIT};
 
 int genereRandom(int min, int max){
-	int srand()
     int randNbr = rand()%(max + 1 - min) + min;
     return randNbr;
 }
 
-int arret(int i){
+int arret(int i) {
     int tempsArrete = 0;
 
     if (genereRandom(0,99) > 80)  {

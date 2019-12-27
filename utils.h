@@ -14,6 +14,7 @@ structCar *qualifiedFor2;
 structCar *qualifiedFor3;
 int indexOf(int i, int longueur, int t[]);
 void killIt();
+int startPosition;
 
 extern struct sembuf semWait0;
 extern struct sembuf semDo0;

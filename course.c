@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void triVoitures(structCar car[]){
+/*void triVoitures(structCar car[]){
     int i = 0;
     structCar temps;
     int j = 0;
@@ -23,4 +23,4 @@ void triVoitures(structCar car[]){
             }
         }
     }
-}
+}*/
