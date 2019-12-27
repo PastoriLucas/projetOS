@@ -17,7 +17,7 @@ void handleSignal(int sig) {
 	myGlobalStaticContinueVariable = 1;
 }
 
-//le premier sémaphore gère le segment de mémoire partagée des voitures (cras, tutureQualif 2 et 3)
+//le premier sémaphore gère le segment de mémoire partagée des voitures (cars, tutureQualif 2 et 3)
 //le deuxième sémaphore gère le segment de mémoire partagée pour différentes variables
 //le troisième sémaphore gère le segment de mémoire partagée pour la liste pid
 
@@ -41,7 +41,7 @@ void randomCrash(int numeroVoiture) {
 	}
 }
 	
-void principal(int nbrVoitures) {
+int principal(int nbrVoitures) {
     int pid;
 	for(int x=0; x<nbrVoitures; x++) {
 		pid = fork();
@@ -56,10 +56,12 @@ void principal(int nbrVoitures) {
 		   
 		    semop(SemId, &semWait2, 1);
 		    semop(SemId, &semDo2, 1);
-			numPid = indexOf(getpid(), 20, listePid);
+			//numPid = indexOf(getpid(), 20, listePid);
+			numPid = x;
 			semop(SemId, &semPost2, 1);
 			
 			genererEssai(1, numPid);
+			return 0;
 		}
 		else if(pid > 0) {
 			semop(SemId, &semWait2, 1);
@@ -68,6 +70,19 @@ void principal(int nbrVoitures) {
 			semop(SemId, &semPost2, 1);
 		}
 	}
+	while(brain[0]!=20) {
+	sleep(0.50);
+	}
+	/* semop(SemId, &semWait1, 1);
+	semop(SemId, &semDo1, 1);
+	printf("%d\n", brain[7]);
+	semop(SemId, &semPost1, 1); */
+	printf("%s\n\n", "S1 :");
+	for(int i=0; i<20;i++) {
+		printf("%.2f\n", voitures[i].bestS1);
+	}
+	printf("%s%.2f\n", "Best time : ", brain[7]);
+	printf("\n%s\n\n", "S2 :");
 }
 	
 	
@@ -114,7 +129,7 @@ int main() {
 			brain[4]=0; //Q2
 			brain[5]=0; //Q3
 			brain[6]=0; //r
-			brain[7]=0; //topS1
+			brain[7]=1000; //topS1
 			brain[8]=0; //topS2
 			brain[9]=0; //topS3
 			brain[10]=0;//topTour
@@ -123,7 +138,7 @@ int main() {
 	listePid = shmat(shmid2, NULL, 1);
 		semop(SemId, &semWait2, 1);
 		semop(SemId, &semDo2, 1);
-			listePid[0]=getpid();
+			listePid[0]=0;
 			listePid[1]=0;
 			listePid[2]=0;
 			listePid[3]=0;

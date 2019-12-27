@@ -33,9 +33,8 @@ struct sembuf semDo2 = {2,1,SEM_UNDO|IPC_NOWAIT};
 struct sembuf semPost2 = {2,-1,SEM_UNDO|IPC_NOWAIT};
 
 double genereRandom(double min, double max){
-	double randNbr;
-    randNbr = (double)rand()/RAND_MAX*max-min;
-    return randNbr;
+    double div = RAND_MAX/(max - min);
+    return min + (rand() / div);
 }
 
 int arret(int i) {
@@ -71,14 +70,16 @@ int calculerTempsMax(int tailleCircuit){
 
 int indexOf(int i, int longueur, int t[])
 {
-    for(int j=0; j<longueur; j++)
-    {
-        if(i==t[j])
-        {
+    for(int j=0; j<longueur; j++) {
+        if(i==t[j]) {
             return j;
         }
-		return 0;
     }
+	for(int k=0; k<longueur;k++) {
+		if(t[k]==0) {
+			return k;
+		}
+	}
 }
 
 int isIn(int nom, int longueur, structCar t[])
@@ -103,7 +104,7 @@ void tempsS1(int i) {
     double temps;
 	double tempsRandom = genereRandom(20,28);
 
-	crash(i);
+	//crash(i);
     
     if(voitures[i].isOut == 0){
         temps = tempsRandom;
@@ -111,7 +112,7 @@ void tempsS1(int i) {
         voitures[i].tempsTour += temps;
         voitures[i].tempsTotal += temps;
 
-        if(voitures[i].bestS1 == 0 || temps < voitures[i].bestS1){
+        if(voitures[i].bestS1 < 1 || temps < voitures[i].bestS1){
             voitures[i].bestS1 = temps;
         }
     }

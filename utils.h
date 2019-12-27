@@ -8,7 +8,7 @@
 double genereRandom(double min, double max);
 int SemId;
 structCar *voitures;
-int *brain;
+double *brain;
 int *listePid;
 structCar *qualifiedFor2;
 structCar *qualifiedFor3;
