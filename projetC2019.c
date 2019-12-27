@@ -56,7 +56,6 @@ int principal(int nbrVoitures) {
 		   
 		    semop(SemId, &semWait2, 1);
 		    semop(SemId, &semDo2, 1);
-			//numPid = indexOf(getpid(), 20, listePid);
 			numPid = x;
 			semop(SemId, &semPost2, 1);
 			
@@ -73,12 +72,28 @@ int principal(int nbrVoitures) {
 	while(brain[0]!=20) {
 	sleep(0.50);
 	}
+	//S1
+	
 	printf("%s\n\n", "S1 :");
 	for(int i=0; i<20;i++) {
-		printf("%.2f%s", voitures[i].bestS1, "   ");
+		printf("%9.2f%s", voitures[i].bestS1, "");
 	}
 	printf("\n%s%.2f\n", "Best time : ", brain[7]);
-	printf("\n%s\n\n", "S2 :");
+	
+	//S2
+	
+	printf("%s\n\n", "S2 :");
+	for(int i=0; i<20;i++) {
+		printf("%9.2f%s", voitures[i].bestS2, "");
+	}
+	printf("\n%s%.2f\n", "Best time : ", brain[8]);
+	
+	//Total
+	
+	printf("\n%s\n\n", "Temps total par voiture :");
+	for(int j=0; j<20;j++) {
+		printf("%9.2f%s", voitures[j].tempsTotal, "");
+	}
 }
 	
 	
@@ -125,7 +140,7 @@ int main() {
 			brain[4]=0; //Q2
 			brain[5]=0; //Q3
 			brain[6]=0; //r
-			brain[7]=1000; //topS1
+			brain[7]=0; //topS1
 			brain[8]=0; //topS2
 			brain[9]=0; //topS3
 			brain[10]=0;//topTour
@@ -156,7 +171,7 @@ int main() {
 			listePid[19]=0;
 			listePid[20]=0;
 		semop(SemId, &semPost2, 1);
-	
+		
 	qualifiedFor2 = shmat(shmid3, NULL, 1);
 	
 	qualifiedFor3 = shmat(shmid4, NULL, 1);
@@ -170,10 +185,6 @@ int main() {
 		semop(SemId, & semPost0, 1);
 	}
 	
-	
-	
-	
-	
-	calculerTempsMax(2);
+	demandeKilometrage();
 	principal(20);
 }

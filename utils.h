@@ -15,7 +15,11 @@ structCar *qualifiedFor3;
 int indexOf(int i, int longueur, int t[]);
 void killIt();
 int startPosition;
+char demandeAction();
+char demandeKilometrage();
 
+int tempsMinParKm = 20;
+int tempsMaxParKm = 30;
 int tempsMinS1;
 int tempsMaxS1;
 int tempsMinS2;

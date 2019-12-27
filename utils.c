@@ -64,8 +64,8 @@ double getTemps() {
 }
 
 int calculerTempsMax(int tailleCircuit){
-		int tempsMinParKm = 60;
-		int tempsMaxParKm = 90;
+		tempsMinParKm = 20;
+		tempsMaxParKm = 30;
 		tempsMinS1 = (tempsMinParKm * tailleCircuit)/4;
 		tempsMaxS1 = (tempsMaxParKm * tailleCircuit)/4;
 		tempsMinS2 = 45*(tempsMinParKm * tailleCircuit)/100;
@@ -110,7 +110,6 @@ void tempsS1(int i) {
 	double tempsRandom = genereRandom(tempsMinS1,tempsMaxS1);
 
 	//crash(i);
-    
     if(voitures[i].isOut == 0){
         temps = tempsRandom;
 		
@@ -124,20 +123,17 @@ void tempsS1(int i) {
     semop(SemId, &semPost0, 1);
 }
 
-void tempsS2(int i)
-{
+void tempsS2(int i) {
     semop(SemId, &semWait0, 1);
     semop(SemId, &semDo0, 1);
     double temps;
+    double tempsRandom = genereRandom(tempsMinS2, tempsMaxS2);
 
-    double tempsRandom = genereRandom(24,30);
-
-    crash(i); //appelle la fonction pour voir si la voiture tombe en panne
+    //crash(i);
 
     if(voitures[i].isOut == 0){
         temps = tempsRandom;
 
-        //Ajout du temps au temps actuel du circuit et au temps total depuis le début de la partie de la course
         voitures[i].tempsTour += temps;
         voitures[i].tempsTotal += temps;
 
@@ -175,22 +171,33 @@ void tempsS3(int i)
     sleep(1);
 }
 
+char demandeKilometrage() {
+int km;
+	char s[100];
+	printf("Bienvenue au Grand Prix de Formule 1 !\n");
+	do
+	{
+		puts("Choisissez la longueur du circuit. Celle-ci doit être comprise entre 1 et 10\n");
+
+		if (fgets(s, 100, stdin) == NULL) //It reads a line from the specified stream and stores it into the string pointed to by st
+		{
+			fprintf(stderr, "erreur lors de la lecture");
+			exit(EXIT_FAILURE);
+		}
+
+		sscanf(s, "%d", &km); //reads formatted input from a string
+	} while (km<1||km>10);
+	calculerTempsMax(km);
+}
+
 char demandeAction(){
     char o;
     char n[100];
-    while (o != 'o' && o != 'n');{
-        printf("Voulez-vous continuer?");
-        printf("\n[O]ui ou [N]on\n");
+	printf("Voulez-vous continuer?");
+	printf("\n[O]ui ou [N]on\n");
 
-        if (fgets(n, 100, stdin) == NULL)
-        {
-            fprintf(stderr, "erreur lors de la lecture");
-            exit(EXIT_FAILURE);
-        }
-
-        sscanf(n, "%c", &o);
-        o = tolower(o);
-    }
+	sscanf(n, "%c", &o);
+	o = tolower(o);
     return o;
 }
 
