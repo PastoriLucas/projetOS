@@ -2,21 +2,31 @@
 #include "utils.h"
 #include "essai.h"
 
-int genererEntrainement(int essai) {
-	double temps_entrainement;
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int genererEssai(int essai, int numPid) {
+	int tempsTotalEssai;
 	if(essai == 1 || essai == 2) {
-		temps_entrainement = 300; //Normalement 5400 (1h30)
+		tempsTotalEssai = 300; //Normalement 5400 (1h30)
 	}
 	if(essai == 3) {
-		temps_entrainement = 200; //Normalement 3600 (1h00)
+		tempsTotalEssai = 200; //Normalement 3600 (1h00)
 	}
-	if(voitures[essai].isOut == 0) {
+	while(voitures[numPid].isOut == 0 && voitures[numPid].tempsTotal < tempsTotalEssai) {
 		
+		tempsS1(numPid);	
+		if(brain[7] == 0 || voitures[numPid].bestS1 < brain[7]) {
+			semop(SemId, &semWait1, 1);
+			semop(SemId, &semDo1, 1);
+			brain[7] = voitures[numPid].bestS1;
+			semop(SemId, &semPost1, 1);
+		}
 	}
-	/*
-	printf("%s%d%s%d\n", "Meilleur temps pour P1 : ", bestTimeP1[1], ". Voiture ", bestTimeP1[0]);
-	printf("%s%d%s%d\n", "Meilleur temps pour P2 : ", bestTimeP2[1], ". Voiture ", bestTimeP2[0]);
-	printf("%s%d%s%d\n", "Meilleur temps pour P3 : ", bestTimeP3[1], ". Voiture ", bestTimeP3[0]);
-	*/
-	
+	/*voitures[numPid].nbrTour = 0;
+	semop(SemId, &semWait1, 1);
+	semop(SemId, &semDo1, 1);
+	brain[7] = 890;
+	semop(SemId, &semPost1, 1);*/
 }

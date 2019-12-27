@@ -8,8 +8,8 @@ typedef struct structCar {
 		double bestS2;      //Meilleur temps sur le deuxieme secteur
 		double bestS3;      //Meilleur temps sur le troisieme secteur
 		int nbrTour;    	//Nombre de tours déjà effectués
-		double elapsedTime; //Temps écoulé depuis le début de la course
-		double timeTour; 	//Heure actuelle de la course
+		double tempsTotal; //Temps écoulé depuis le début de la course
+		double tempsTour; 	//Heure actuelle de la course
 		int nbrStand;       //nombre de fois qu'il a passé le stand (entre 1 et 3)
 		int isOut;          //0 si la voiture est toujours en marche, 1 si c'est le crash
 	}structCar;

@@ -5,16 +5,21 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
-
+double genereRandom(double min, double max);
 int SemId;
 structCar *voitures;
-int *shMem;
+int *brain;
 int *listePid;
 structCar *qualifiedFor2;
 structCar *qualifiedFor3;
 int indexOf(int i, int longueur, int t[]);
 void killIt();
 int startPosition;
+int tempsMaxCircuit;
+int calculerTempsMax(int tailleCircuit);
+void tempsS1(int i);
+void tempsS2(int i);
+void tempsS3(int i);
 
 extern struct sembuf semWait0;
 extern struct sembuf semDo0;

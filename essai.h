@@ -1,8 +1,11 @@
 #ifndef essai_h
 #define essai_h
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "cars.h"
-int genererEntrainement(int i);
+int genererEssai(int i, int numPid);
 
 void genereRecapEntrainementFile();
 

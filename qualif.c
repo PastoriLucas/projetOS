@@ -98,7 +98,7 @@ void qualif(int index, int q){
         genereTempsS1(index);
 
         //si la voiture a un meilleur temps pour S1 que toutes les autres, mise à jour de la variable globale
-        if(voitures[index].bestS1<shMem[7])
+        if(voitures[index].bestS1<brain[7])
         {
             semop(SemId, &semWait1, 1);
             semop(SemId, &semDo1, 1);
@@ -130,7 +130,7 @@ void qualif(int index, int q){
         {
             semop(SemId, &semWait1, 1);
             semop(SemId, &semDo1, 1);
-            shMem[10] = voitures[index].bestTour;
+            brain[10] = voitures[index].bestTour;
             semop(SemId, &semPost1, 1);
         }
         // mise à jour de l'heure actuelle de la course

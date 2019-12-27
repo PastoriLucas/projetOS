@@ -32,8 +32,9 @@ struct sembuf semDo2 = {2,1,SEM_UNDO|IPC_NOWAIT};
 //décrémente la valeur du sémaphore pour la débloquer
 struct sembuf semPost2 = {2,-1,SEM_UNDO|IPC_NOWAIT};
 
-int genereRandom(int min, int max){
-    int randNbr = rand()%(max + 1 - min) + min;
+double genereRandom(double min, double max){
+	double randNbr;
+    randNbr = (double)rand()/RAND_MAX*max-min;
     return randNbr;
 }
 
@@ -47,38 +48,25 @@ int arret(int i) {
     return tempsArrete;
 }
 
-void crash(int index){
-    if (genereRandom(0,999) > 998){
-        voitures[index].isOut = 1;
+void crash(int numPid){
+    if (genereRandom(0,150) > 149){
+        voitures[numPid].isOut = 1;
     }
 }
 
 double getTemps() {
     double temps = 0;
     for (int i=0; i<20; i++){
-        if(voitures[i].elapsedTime > temps) {
-            temps = voitures[i].elapsedTime;
+        if(voitures[i].tempsTotal > temps) {
+            temps = voitures[i].tempsTotal;
         }
     }
     return temps;
 }
 
-int nbrTour(int km){
-    int nbr = 5;			// Le nombre de tours par défaut
-    int longueurMinCourse = 50;	// longueur minimale pour une course
-    if(km == 0)  //si l'utilisateur n'entre pas de paramètre pour les kilomètres
-    {
-        return nbr;
-    }
-    if(longueurMinCourse % km == 0)
-    {
-        nbr = longueurMinCourse/km;
-    }
-    else
-    {
-        nbr = 1 + (longueurMinCourse/km);
-    }
-    return nbr;
+int calculerTempsMax(int tailleCircuit){	
+		int tempsMaxParKm = 20;
+		tempsMaxCircuit = tempsMaxParKm * tailleCircuit;
 }
 
 int indexOf(int i, int longueur, int t[])
@@ -89,9 +77,8 @@ int indexOf(int i, int longueur, int t[])
         {
             return j;
         }
+		return 0;
     }
-    //si le pid n'est pas dans l'onglet, nous renvoyons la longueur de l'onglet pour permettre la détection d'erreur
-    return longueur;
 }
 
 int isIn(int nom, int longueur, structCar t[])
@@ -108,35 +95,30 @@ int isIn(int nom, int longueur, structCar t[])
     return k;
 }
 
-void genereTempsS1(int i)
-{
+void tempsS1(int i) {
     semop(SemId, &semWait0, 1);
     semop(SemId, &semDo0, 1);
+	
+	voitures[i].tempsTour = 0.0;
     double temps;
+	double tempsRandom = genereRandom(20,28);
 
-    if(!(/*isCourse == 1 && */voitures[i].timeTour == 0)){
-        voitures[i].timeTour = 0.0;  //réinitialiser la valeur du temps pour le tour en cours
-    }
-    double tempsRandom = genereRandom(20,28);
-
-    crash(i); //appelle la fonction pour voir si la voiture tombe en panne
-
+	crash(i);
+    
     if(voitures[i].isOut == 0){
         temps = tempsRandom;
+		
+        voitures[i].tempsTour += temps;
+        voitures[i].tempsTotal += temps;
 
-        //Ajout du temps au temps actuel du circuit et au temps total depuis le début de la partie de la course
-        voitures[i].timeTour += temps;
-        voitures[i].elapsedTime += temps;
-
-        // Modification du meilleur moment pour le secteur 1 si le nouveau est meilleur
-        if(voitures[i].bestS1 < 1 || temps < voitures[i].bestS1){
+        if(voitures[i].bestS1 == 0 || temps < voitures[i].bestS1){
             voitures[i].bestS1 = temps;
         }
     }
     semop(SemId, &semPost0, 1);
 }
 
-void genereTempsS2(int i)
+void tempsS2(int i)
 {
     semop(SemId, &semWait0, 1);
     semop(SemId, &semDo0, 1);
@@ -150,8 +132,8 @@ void genereTempsS2(int i)
         temps = tempsRandom;
 
         //Ajout du temps au temps actuel du circuit et au temps total depuis le début de la partie de la course
-        voitures[i].timeTour += temps;
-        voitures[i].elapsedTime += temps;
+        voitures[i].tempsTour += temps;
+        voitures[i].tempsTotal += temps;
 
         // Modification du meilleur moment pour le secteur 1 si le nouveau est meilleur
         if(voitures[i].bestS2 < 1 || temps < voitures[i].bestS2){
@@ -161,7 +143,7 @@ void genereTempsS2(int i)
     semop(SemId, &semPost0, 1);
 }
 
-void genereTempsS3(int i)
+void tempsS3(int i)
 {
     semop(SemId, &semWait0, 1);
     semop(SemId, &semDo0, 1);
@@ -175,8 +157,8 @@ void genereTempsS3(int i)
         temps = tempsRandom;
 
         //Ajout du temps au temps actuel du circuit et au temps total depuis le début de la partie de la course
-        voitures[i].timeTour += temps;
-        voitures[i].elapsedTime += temps;
+        voitures[i].tempsTour += temps;
+        voitures[i].tempsTotal += temps;
 
         // Modification du meilleur moment pour le secteur 1 si le nouveau est meilleur
         if(voitures[i].bestS3< 1 || temps < voitures[i].bestS3){
@@ -214,7 +196,7 @@ void interaction(int i)
     {
         semop(SemId, &semWait1, 1);
         semop(SemId, &semDo1, 1);
-        shMem[i]=0;
+        brain[i]=0;
         semop(SemId, &semPost1, 1);
     }
     else
@@ -250,7 +232,7 @@ void sortCourse(structCar carQualif[], int sizeArrayVoitures)
     {
         for(j = i+1; j < sizeArrayVoitures; j++)
         {
-            if((carQualif[j].elapsedTime < carQualif[i].elapsedTime)&&(carQualif[j].isOut==0))
+            if((carQualif[j].tempsTotal < carQualif[i].tempsTotal)&&(carQualif[j].isOut==0))
             {
                 tmpCar = carQualif[i];
                 carQualif[i] = carQualif[j];
@@ -267,8 +249,8 @@ void ajouteTempsEnFctPosition()//en fct de la place de la voiture au début de l
         for(int i = 0; i < 20; i++)
         {
             //if (voitures[i].number == startingBlock[j]){   // ajouter du temps par position par rapport à la première
-                voitures[i].elapsedTime += j * 0.3;     // à l'heure normale
-                voitures[i].timeTour = j * 0.3;   // chronométrer sur un tour
+                voitures[i].tempsTotal += j * 0.3;     // à l'heure normale
+                voitures[i].tempsTour = j * 0.3;   // chronométrer sur un tour
             //}
         }
     }
