@@ -5,50 +5,64 @@
 #include <ctype.h>
 #include <unistd.h>
 
-//indique que la valeur du sémaphore devrait être 0
-struct sembuf semWait0 = {0,0,SEM_UNDO};
 
-//incrémente la valeur du sémaphore pour la bloquer
-struct sembuf semDo0 = {0,1,SEM_UNDO|IPC_NOWAIT};
-
-//décrémente la valeur du sémaphore pour la débloquer
-struct sembuf semPost0 = {0,-1,SEM_UNDO|IPC_NOWAIT};
-
-//indique que la valeur du sémaphore devrait être 0
-struct sembuf semWait1 = {1,0,SEM_UNDO};
-
-//incrémente la valeur du sémaphore pour la bloquer
-struct sembuf semDo1 = {1,1,SEM_UNDO|IPC_NOWAIT};
-
-//décrémente la valeur du sémaphore pour la débloquer
-struct sembuf semPost1 = {1,-1,SEM_UNDO|IPC_NOWAIT};
-
-//indique que la valeur du sémaphore devrait être 0
-struct sembuf semWait2 = {2,0,SEM_UNDO};
-
-//incrémente la valeur du sémaphore pour la bloquer
-struct sembuf semDo2 = {2,1,SEM_UNDO|IPC_NOWAIT};
-
-//décrémente la valeur du sémaphore pour la débloquer
-struct sembuf semPost2 = {2,-1,SEM_UNDO|IPC_NOWAIT};
+struct sembuf semPlus0 = {0,1,SEM_UNDO|IPC_NOWAIT}; // +1 au sémaphore pour le locker
+struct sembuf semMoins0 = {0,-1,SEM_UNDO|IPC_NOWAIT}; // -1 au sémaphore pour le délocker
+struct sembuf semPlus1 = {1,1,SEM_UNDO|IPC_NOWAIT}; // +1 au sémaphore pour le locker
+struct sembuf semMoins1 = {1,-1,SEM_UNDO|IPC_NOWAIT}; // -1 au sémaphore pour le délocker
+struct sembuf semPlus2 = {2,1,SEM_UNDO|IPC_NOWAIT}; // +1 au sémaphore pour le locker
+struct sembuf semMoins2 = {2,-1,SEM_UNDO|IPC_NOWAIT}; // -1 au sémaphore pour le délocker
 
 double genereRandom(double min, double max){
     double div = RAND_MAX/(max - min);
     return min + (rand() / div);
 }
 
-int arret(int i) {
-    int tempsArrete = 0;
-
-    if (genereRandom(0,99) > 80)  {
-        voitures[i].nbrStand ++;
-        tempsArrete += (genereRandom(24,44)/10,0);
-    }
-    return tempsArrete;
+void arret(int i) {
+    int randomStand = (int)genereRandom(0,11);
+	if(randomStand < 1) {
+		voitures[i].nbrStand = 3;
+		voitures[i].tempsTotal += (15);
+	}
+	else if(randomStand < 2) {
+		voitures[i].nbrStand = 3;
+		voitures[i].tempsTotal += (15);
+	}
+	else if(randomStand < 3) {
+		voitures[i].nbrStand = 3;
+		voitures[i].tempsTotal += (15);
+	}
+	else if(randomStand < 4) {
+		voitures[i].nbrStand = 3;
+		voitures[i].tempsTotal += (15);
+	}
+	else if(randomStand < 5) {
+		voitures[i].nbrStand = 2;
+		voitures[i].tempsTotal += (10);
+	}
+	else if(randomStand < 6) {
+		voitures[i].nbrStand = 2;
+		voitures[i].tempsTotal += (10);
+	}
+	else if(randomStand < 7) {
+		voitures[i].nbrStand = 2;
+		voitures[i].tempsTotal += (10);
+	}
+	else if(randomStand < 8) {
+		voitures[i].nbrStand = 2;
+		voitures[i].tempsTotal += (10);
+	}
+	else if(randomStand < 9) {
+		voitures[i].nbrStand = 1;
+		voitures[i].tempsTotal += (5);
+	}
+	else {
+		voitures[i].nbrStand = 0;
+	}
 }
 
 void crash(int numPid){
-    if (genereRandom(0,150) > 149){
+    if (genereRandom(0,800) > 799){
         voitures[numPid].isOut = 1;
     }
 }
@@ -103,13 +117,11 @@ int isIn(int nom, int longueur, structCar t[])
 }
 
 void tempsS1(int i) {
-    semop(SemId, &semWait0, 1);
-    semop(SemId, &semDo0, 1);
-	voitures[i].tempsTour = 0.0;
+    semop(SemId, &semPlus0, 1);
     double temps;
 	double tempsRandom = genereRandom(tempsMinS1,tempsMaxS1);
 
-	//crash(i);
+	crash(i);
     if(voitures[i].isOut == 0){
         temps = tempsRandom;
 		
@@ -120,16 +132,15 @@ void tempsS1(int i) {
             voitures[i].bestS1 = temps;
         }
     }
-    semop(SemId, &semPost0, 1);
+    semop(SemId, &semMoins0, 1);
 }
 
 void tempsS2(int i) {
-    semop(SemId, &semWait0, 1);
-    semop(SemId, &semDo0, 1);
+    semop(SemId, &semPlus0, 1);
     double temps;
     double tempsRandom = genereRandom(tempsMinS2, tempsMaxS2);
 
-    //crash(i);
+    crash(i);
 
     if(voitures[i].isOut == 0){
         temps = tempsRandom;
@@ -137,50 +148,88 @@ void tempsS2(int i) {
         voitures[i].tempsTour += temps;
         voitures[i].tempsTotal += temps;
 
-        // Modification du meilleur moment pour le secteur 1 si le nouveau est meilleur
+        // Modification du meilleur moment pour le secteur 2 si le nouveau est meilleur
         if(voitures[i].bestS2 < 1 || temps < voitures[i].bestS2){
             voitures[i].bestS2 = temps;
         }
     }
-    semop(SemId, &semPost0, 1);
+    semop(SemId, &semMoins0, 1);
 }
-
-void tempsS3(int i)
-{
-    semop(SemId, &semWait0, 1);
-    semop(SemId, &semDo0, 1);
+void tempsS3(int i) {
+    semop(SemId, &semPlus0, 1);
     double temps;
+    double tempsRandom = genereRandom(tempsMinS3, tempsMaxS3);
 
-    double tempsRandom = genereRandom(26,32);
-
-    crash(i); //appelle la fonction pour voir si la voiture tombe en panne
+    crash(i);
 
     if(voitures[i].isOut == 0){
         temps = tempsRandom;
 
-        //Ajout du temps au temps actuel du circuit et au temps total depuis le début de la partie de la course
         voitures[i].tempsTour += temps;
         voitures[i].tempsTotal += temps;
 
-        // Modification du meilleur moment pour le secteur 1 si le nouveau est meilleur
-        if(voitures[i].bestS3< 1 || temps < voitures[i].bestS3){
+        // Modification du meilleur moment pour le secteur 3 si le nouveau est meilleur
+        if(voitures[i].bestS3 < 1 || temps < voitures[i].bestS3){
             voitures[i].bestS3 = temps;
         }
     }
-    semop(SemId, &semPost0, 1);
-    sleep(1);
+    semop(SemId, &semMoins0, 1);
+}
+
+void triVoitures(structCar voituresATrier[], int numCourse) {
+	if(numCourse == 1 || numCourse == 2 || numCourse == 3 || numCourse == 4 || numCourse == 7) {
+		for(int i=0;i<20;i++) {
+			for(int j=0;j<20;j++) {
+				if(voituresATrier[i].bestTour == 0) {
+					
+				}
+				else if(voituresATrier[j].bestTour > voituresATrier[i].bestTour || voituresATrier[j].bestTour == 0) {
+					semop(SemId, &semPlus0, 1);
+					structCar temporaire = voituresATrier[i];
+					voituresATrier[i] = voituresATrier[j];
+					voituresATrier[j] = temporaire;
+					semop(SemId, &semMoins0, 1);
+				}
+			}
+		}
+	}
+	else if(numCourse == 5) {
+		for(int i=0;i<15;i++) {
+			for(int j=0;j<15;j++) {
+				if(voituresATrier[j].bestTour > voituresATrier[i].bestTour) {
+					semop(SemId, &semPlus0, 1);
+					structCar temporaire = voituresATrier[i];
+					voituresATrier[i] = voituresATrier[j];
+					voituresATrier[j] = temporaire;
+					semop(SemId, &semMoins0, 1);
+				}
+			}
+		}
+	}
+	else if(numCourse == 6) {
+		for(int i=0;i<10;i++) {
+			for(int j=0;j<10;j++) {
+				if(voituresATrier[j].bestTour > voituresATrier[i].bestTour) {
+					semop(SemId, &semPlus0, 1);
+					structCar temporaire = voituresATrier[i];
+					voituresATrier[i] = voituresATrier[j];
+					voituresATrier[j] = temporaire;
+					semop(SemId, &semMoins0, 1);
+				}
+			}
+		}
+	}
 }
 
 char demandeKilometrage() {
-int km;
+	int km;
 	char s[100];
 	printf("Bienvenue au Grand Prix de Formule 1 !\n");
 	do
 	{
-		puts("Choisissez la longueur du circuit. Celle-ci doit être comprise entre 1 et 10\n");
+		puts("Choisissez la longueur du circuit. Celle-ci doit être comprise entre 1 et 10");
 
-		if (fgets(s, 100, stdin) == NULL) //It reads a line from the specified stream and stores it into the string pointed to by st
-		{
+		if (fgets(s, 100, stdin) == NULL) {
 			fprintf(stderr, "erreur lors de la lecture");
 			exit(EXIT_FAILURE);
 		}
@@ -190,33 +239,102 @@ int km;
 	calculerTempsMax(km);
 }
 
-char demandeAction(){
-    char o;
-    char n[100];
-	printf("Voulez-vous continuer?");
-	printf("\n[O]ui ou [N]on\n");
+char demandeContinuer(int numCourse){
+	int o;
+	char n[100];
+	do
+	{
+		if(numCourse == 1) {
+			puts("\n\nLes voitures sont sur les starting blocks, voulez vous lancer le 1er entrainement ? \n Oui (1) / Non (0)");
+		}
+		if(numCourse == 2) {
+			puts("\n\nLes voitures sont sur les starting blocks, voulez vous lancer le 2eme entrainement ? \n Oui (1) / Non (0)");
+		}
+		if(numCourse == 3) {
+			puts("\n\nLes voitures sont sur les starting blocks, voulez vous lancer le 3eme entrainement ? \n Oui (1) / Non (0)");
+		}
+		if(numCourse == 4) {
+			puts("\n\nLes voitures sont sur les starting blocks, voulez vous lancer la 1ere qualification ? \n Oui (1) / Non (0)");
+		}
+		if(numCourse == 5) {
+			puts("\n\nLes voitures sont sur les starting blocks, voulez vous lancer la 2eme qualification ? \n Oui (1) / Non (0)");
+		}
+		if(numCourse == 6) {
+			puts("\n\nLes voitures sont sur les starting blocks, voulez vous lancer la 3eme qualification ? \n Oui (1) / Non (0)");
+		}
+		if(numCourse == 7) {
+			puts("\n\nLes voitures sont sur les starting blocks, voulez vous lancer la course finale ? \n Oui (1) / Non (0)");
+		}
 
-	sscanf(n, "%c", &o);
-	o = tolower(o);
-    return o;
+		if (fgets(n, 100, stdin) == NULL) {
+			fprintf(stderr, "erreur lors de la lecture");
+			exit(EXIT_FAILURE);
+		}
+
+		sscanf(n, "%d", &o);
+	} while (o >1000);
+	if(o == 1) {
+		semop(SemId, &semPlus1, 1);
+		brain[11] = 1;
+		semop(SemId, &semMoins1, 1);
+	}
+	else {
+		semop(SemId, &semPlus1, 1);
+		brain[11] = 0;
+		semop(SemId, &semMoins1, 1);
+	}
 }
 
 
-void interaction(int i)
+/*void interaction(int i)
 {
     char o = demandeAction();
     if(o=='o')
     {
-        semop(SemId, &semWait1, 1);
-        semop(SemId, &semDo1, 1);
+        semop(SemId, &semPlus1, 1);
         brain[i]=0;
-        semop(SemId, &semPost1, 1);
+        semop(SemId, &semMoins1, 1);
     }
     else
     {
         killIt();
         exit(0);
     }
+}*/
+
+void afficherResultatsEssai() {
+	printf("|%s|  %s  |     %s    |     %s    |     %s    |    %s   |   %s  |   %s   |\n", "Classement", "Numero", "Best S1", "Best S2", "Best S2", "Best Tour", "Stand", "Out ?");
+	printf("------------------------------------------------------------------------------------------------------------------\n");
+	for(int i=0; i<20;i++) {
+		printf("|    %2d    |    %2d    |    %7.2f     |    %7.2f     |    %7.2f     |    %7.2f     |    %2d    |    %2d     |\n", i+1, voitures[i].number, voitures[i].bestS1, voitures[i].bestS2, voitures[i].bestS3, voitures[i].bestTour, voitures[i].nbrStand, voitures[i].isOut);
+	}
+	printf("\n%s%.2f\n", "Meilleur S1 : ", brain[7]);
+	printf("\n%s%.2f\n", "Meilleur S2 : ", brain[8]);
+	printf("\n%s%.2f\n", "Meilleur S3 : ", brain[9]);
+}
+
+void afficherResultatsQualif(int qualif) {
+	int nbrVoitures;
+	if(qualif == 1) {
+		nbrVoitures = 20;
+	}
+	if(qualif == 2) {
+		nbrVoitures = 15;
+	}
+	if(qualif == 3) {
+		nbrVoitures = 10;
+	}
+	printf("|%s|  %s  |     %s    |     %s    |     %s    |    %s   |   %s  |   %s   |\n", "Classement", "Numero", "Best S1", "Best S2", "Best S2", "Best Tour", "Stand", "Out ?");
+	printf("------------------------------------------------------------------------------------------------------------------\n");
+	for(int i=0; i<nbrVoitures;i++) {
+		printf("|    %2d    |    %2d    |    %7.2f     |    %7.2f     |    %7.2f     |    %7.2f     |    %2d    |    %2d     |\n", i+1, voitures[i].number, voitures[i].bestS1, voitures[i].bestS2, voitures[i].bestS3, voitures[i].bestTour, voitures[i].nbrStand, voitures[i].isOut);
+	}
+	printf("\n%s%.2f\n", "Meilleur S1 : ", brain[7]);
+	printf("\n%s%.2f\n", "Meilleur S2 : ", brain[8]);
+	printf("\n%s%.2f\n", "Meilleur S3 : ", brain[9]);	
+}
+void afficherResultatsCourse() {
+	
 }
 
 void killIt()

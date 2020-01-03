@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+void arret(int i);
 double genereRandom(double min, double max);
 int SemId;
 structCar *voitures;
@@ -15,11 +16,11 @@ structCar *qualifiedFor3;
 int indexOf(int i, int longueur, int t[]);
 void killIt();
 int startPosition;
-char demandeAction();
+char demandeContinuer(int numCourse);
 char demandeKilometrage();
 
-int tempsMinParKm = 20;
-int tempsMaxParKm = 30;
+int tempsMinParKm;
+int tempsMaxParKm;
 int tempsMinS1;
 int tempsMaxS1;
 int tempsMinS2;
@@ -31,15 +32,16 @@ int calculerTempsMax(int tailleCircuit);
 void tempsS1(int i);
 void tempsS2(int i);
 void tempsS3(int i);
+void triVoitures(structCar voituresATrier[], int numCourse);
+void afficherResultatsEssai();
+void afficherResultatsQualif(int qualif);
+void afficherResultatsCourse();
 
-extern struct sembuf semWait0;
-extern struct sembuf semDo0;
-extern struct sembuf semPost0;
-extern struct sembuf semWait1;
-extern struct sembuf semDo1;
-extern struct sembuf semPost1;
-extern struct sembuf semWait2;
-extern struct sembuf semDo2;
-extern struct sembuf semPost2;
+extern struct sembuf semPlus0;
+extern struct sembuf semMoins0;
+extern struct sembuf semPlus1;
+extern struct sembuf semMoins1;
+extern struct sembuf semPlus2;
+extern struct sembuf semMoins2;
 
 #endif
