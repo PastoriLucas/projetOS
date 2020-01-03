@@ -6,8 +6,4 @@
 #include <unistd.h>
 #include "cars.h"
 int genererEssai(int i, int numPid);
-
-//void genereRecapEntrainementFile();
-
-
 #endif

@@ -1,8 +1,6 @@
-//
-// Created by myria on 26-12-19.
-//
+#ifndef course_h
+#define course_h
+#include "cars.h"
 
-#ifndef PROJET_C_COURSE_H
-#define PROJET_C_COURSE_H
-
-#endif //PROJET_C_COURSE_H
+int genererCourse(int numPid);
+#endif

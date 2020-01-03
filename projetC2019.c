@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "essai.h"
 #include "qualif.h"
+#include "course.h"
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -68,6 +69,12 @@ int principal(int nbrVoitures) {
 
 					genererQualif(3, numPid);
 					sleep(1);
+				//COURSE FINALE
+					while(brain[11] != 1) {
+						sleep(0.50);
+					}
+					genererCourse(numPid);
+					sleep(0);
 				return 0;
 			}
 			else if(pid > 0) {
@@ -81,6 +88,7 @@ int principal(int nbrVoitures) {
 			brain[7] = 0;
 			brain[8] = 0;
 			brain[9] = 0;
+			brain[10] = 0;
 		semop(SemId, &semMoins1, 1);
 		
 		demandeContinuer(1);
@@ -106,6 +114,7 @@ int principal(int nbrVoitures) {
 			brain[7] = 0;
 			brain[8] = 0;
 			brain[9] = 0;
+			brain[10] = 0;
 		semop(SemId, &semMoins1, 1);
 		demandeContinuer(2);
 		if(brain[11] == 0) {
@@ -127,6 +136,7 @@ int principal(int nbrVoitures) {
 			brain[7] = 0;
 			brain[8] = 0;
 			brain[9] = 0;
+			brain[10] = 0;
 		semop(SemId, &semMoins1, 1);
 		demandeContinuer(3);
 		if(brain[11] == 0) {
@@ -148,6 +158,7 @@ int principal(int nbrVoitures) {
 			brain[7] = 0;
 			brain[8] = 0;
 			brain[9] = 0;
+			brain[10] = 0;
 		semop(SemId, &semMoins1, 1);
 		demandeContinuer(4);
 		if(brain[11] == 0) {
@@ -175,6 +186,7 @@ int principal(int nbrVoitures) {
 			brain[7] = 0;
 			brain[8] = 0;
 			brain[9] = 0;
+			brain[10] = 0;
 		semop(SemId, &semMoins1, 1);
 		demandeContinuer(5);
 		if(brain[11] == 0) {
@@ -201,6 +213,7 @@ int principal(int nbrVoitures) {
 			brain[7] = 0;
 			brain[8] = 0;
 			brain[9] = 0;
+			brain[10] = 0;
 		semop(SemId, &semMoins1, 1);
 		demandeContinuer(6);
 		if(brain[11] == 0) {
@@ -215,6 +228,28 @@ int principal(int nbrVoitures) {
 		
 		triVoitures(voitures, 6);
 		afficherResultatsQualif(3);
+		
+	//EXECUTION DE LA COURSE FINALE
+	
+		semop(SemId, &semPlus1, 1);
+			brain[7] = 0;
+			brain[8] = 0;
+			brain[9] = 0;
+			brain[10] = 0;
+		semop(SemId, &semMoins1, 1);
+		demandeContinuer(7);
+		if(brain[11] == 0) {
+			return 0;
+		}
+		while(brain[6]!=20) {
+			sleep(0.50);
+		}
+		semop(SemId, &semPlus1, 1);
+		brain[11] = -1;
+		semop(SemId, &semMoins1, 1);
+		
+		triVoitures(voitures, 7);
+		afficherResultatsCourse();
 }
 	
 	
@@ -259,7 +294,7 @@ int main() {
 			brain[3]=0; //Q1
 			brain[4]=0; //Q2
 			brain[5]=0; //Q3
-			brain[6]=0; //Final
+			brain[6]=0; //Course finale
 			brain[7]=-1; //topS1
 			brain[8]=-1; //topS2
 			brain[9]=-1; //topS3

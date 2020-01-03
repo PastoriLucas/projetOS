@@ -12,12 +12,13 @@ int genererEssai(int essai, int numPid) {
 		tempsTotalEssai = 5400;
 	}
 	if(essai == 3) {
-		tempsTotalEssai = 3600; //Normalement 3600 (1h00)
+		tempsTotalEssai = 3600;
 	}
 	voitures[numPid].bestS1 = 0;
 	voitures[numPid].bestS2 = 0;
 	voitures[numPid].bestS3 = 0;
 	voitures[numPid].isOut = 0;
+	voitures[numPid].nbrTour = 0;
 	voitures[numPid].bestTour = 0;
 	voitures[numPid].tempsTotal = 0;
 	
@@ -27,6 +28,7 @@ int genererEssai(int essai, int numPid) {
 										
 										
 	while(voitures[numPid].isOut == 0 && voitures[numPid].tempsTotal < tempsTotalEssai) {
+		sleep(0.50);
 		voitures[numPid].tempsTour = 0;
 		if(voitures[numPid].isOut == 0) {
 			tempsS1(numPid);	
@@ -47,7 +49,11 @@ int genererEssai(int essai, int numPid) {
 		}
 		
 		if(voitures[numPid].isOut == 0) {
+			int isStand = voitures[numPid].nbrStand;
 			tempsS3(numPid);
+			if(voitures[numPid].nbrStand != isStand) {
+				voitures[numPid].tempsTotal += 5;
+			}
 			if((voitures[numPid].bestS3 < (double)brain[9]) || ((double)brain[9] < 1)) {
 				semop(SemId, &semPlus1, 1);
 				brain[9] = (voitures[numPid].bestS3);
@@ -56,8 +62,18 @@ int genererEssai(int essai, int numPid) {
 		}	
 		if(voitures[numPid].isOut == 0) {
 			if(voitures[numPid].bestTour < 1 || voitures[numPid].tempsTour < voitures[numPid].bestTour) {
+				semop(SemId, &semPlus0, 1);
 				voitures[numPid].bestTour = voitures[numPid].tempsTour;
+				semop(SemId, &semMoins0, 1);
+				if((voitures[numPid].bestTour < (double)brain[10]) || ((double)brain[10] < 1)) {
+					semop(SemId, &semPlus1, 1);
+					brain[10] = (voitures[numPid].bestTour);
+					semop(SemId, &semMoins1, 1);
+				}
 			}
+		}
+		if(voitures[numPid].isOut == 0) {
+			voitures[numPid].nbrTour++;
 		}
 	}
 	if(voitures[numPid].isOut == 0) {
