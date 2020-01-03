@@ -179,7 +179,7 @@ void qualif(int index, int q){
         genereTempsS1(index);
 
         //si la voiture a un meilleur temps pour S1 que toutes les autres, mise à jour de la variable globale
-        if(voitures[index].bestS1<brain[7])
+        if(voitures[index].bestS1<smv[7])
         {
             semop(SemId, &semWait1, 1);
             semop(SemId, &semDo1, 1);
@@ -245,40 +245,22 @@ void qualif(int index, int q){
     }
 }
 
-void genereRecapQualifFile()
+void RecapQualif()
 {
-    FILE *fichier = NULL;
-
-    //ouverture du fichier avec l'argument "a" pour annexer chaque entrainement
-    fichier = fopen("RecapQualifFile.txt", "a");//cree et ouvre le fichier
-
-    if(fichier != NULL){
-
-        structCar qualif[20];
-        for(int i =0; i<20; i++)
-        {
-            qualif[i]=voitures[i];
-        }
-        triVoitures(qualif, 20);
-
-
-        fprintf(fichier, "\n|   Voiture |       Secteur 1 |       Secteur 2  |      Secteur 3  |     Best Tour    |    Temps Total  |   STAND P   |    ABANDON  |\n");
-        for(int i = 0; i < 20; i++){
-
-            fprintf(fichier, "*     %2d    *  %10.2lf sec *  %10.2lf sec  * %10.2lf sec  *  %10.2lf sec  *  %10.2lf sec *      %2d     *      %2d     *\n", qualif[i].nombre,qualif[i].bestS1,qualif[i].bestS2,qualif[i].bestS3,qualif[i].bestTour,qualif[i].elapsedTime,qualif[i].nbrStand,qualif[i].isOut);
-
-        }
-        fclose(fichier);
+    structCar tableau[20];
+    for (int i = 0 ; i < 20 ; i++){
+        tableau[i] = voitures[i];
     }
-    else{
-        printf("Ouverture du fichier recap impossible");
-    }
-    //Après avoir sauvegardé les valeurs dans le fichier, on les initialise, les voitures vont redémarrer
-    //l'entrainement suivant avec un nouvel état
 
-    for(int i=0; i<20; i++)
-    {
-        reset(i);
+    triVoitures(tableau, 20);
+
+    printf("Voiture    |    S1    |    S2    |    S3    |    Meilleur Tour    |    Total    |    Stand    |    Sortie    |\n");
+    for (int j = 0; j <20 ; j++) {
+        printf ("* %2d       * %10.21f sec * %10.21f sec * %10.21 sec * %10.21f sec * 10.21f sec *    %2d    *    %2d    *\n", tableau[j].number, tableau[j].bestS1, tableau[j].bestS2, tableau[j].bestS3, tableau[j].bestTour, tableau[j].tempsTotal, tableau[j].nbrStand, tableau[j].isOut);
+    }
+
+    for (int k = 0; k < 20 ; k++) {
+        reset(k);
     }
 }
 */
