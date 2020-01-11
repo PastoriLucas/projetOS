@@ -16,8 +16,5 @@ typedef struct structCar {
 		int isQualifiedFor3;
 	}structCar;
 	
-void initialiserVoitures(int i, int nbr);
-
-void crash(int index);
-
+void creerVoitures(int i, int nbr);
 #endif
