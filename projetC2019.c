@@ -2,17 +2,12 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-#include "cars.h"
 #include "utils.h"
-#include "essai.h"
-#include "qualif.h"
-#include "course.h"
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/sem.h>
 #include <signal.h>
-	
 	
 //Fonction principale qui gère la création de voitures et le déroulement du week-end
 int principal(int nbrVoitures) {

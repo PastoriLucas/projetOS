@@ -1,11 +1,35 @@
-﻿#include "utils.h"
-#include <stdbool.h>
+﻿#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/sem.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
+#include "utils.h"
 
+
+void creerVoitures(int i, int nbr) {
+	voitures[i].number = nbr;    	//Numero de voiture
+	voitures[i].nbrTour = 0;   		//Nombre de tours effectués
+	voitures[i].tempsTour = 0;  	//Temps effectué pour le tour en cours
+	voitures[i].bestS1 = 0;      	//Meilleur temps secteur 1
+	voitures[i].bestS2 = 0;       	//Meilleur temps secteur 2
+	voitures[i].bestS3 = 0;       	//Meilleur temps secteur 3
+	voitures[i].bestTour = 0;  		//Meilleur tour de circuit
+	voitures[i].tempsTotal = 0;    	//Temps écoulé depuis le début de la course
+	voitures[i].nbrStand = 0;      	//Nombre d'arrêts au stand (1-3)
+	voitures[i].isOut = 0;        	//Se met à 1 si la voiture se crash
+	voitures[i].isQualifiedFor2 = 0;//Se met à 1 si la voiture est qualifiée pour la 2e qualif
+	voitures[i].isQualifiedFor3 = 0;//Se met à 1 si la voiture est qualifiée pour la 3e qualif
+}
 
 struct sembuf semPlus = {0,1,SEM_UNDO|IPC_NOWAIT}; // +1 au sémaphore pour le locker
 struct sembuf semMoins = {0,-1,SEM_UNDO|IPC_NOWAIT}; // -1 au sémaphore pour le délocker
@@ -274,4 +298,260 @@ void afficherResultatsCourse() {
 	printf("\n%s%.2f\n", "Meilleur S2 : ", brain[8]);
 	printf("\n%s%.2f\n", "Meilleur S3 : ", brain[9]);
 	printf("\n%s%.2f\n", "Meilleur tour : ", brain[10]);
+}
+
+int genererEssai(int essai, int numPid) {
+	int tempsTotalEssai;
+	if(essai == 1 || essai == 2) {
+		tempsTotalEssai = 5400;		//Temps maximal pour les essais 1 et 2. Ici, 1h30
+	}
+	if(essai == 3) {
+		tempsTotalEssai = 3600;		//Temps maximal pour l'essai 3. Ici, 1h
+	}
+	voitures[numPid].bestS1 = 0;
+	voitures[numPid].bestS2 = 0;
+	voitures[numPid].bestS3 = 0;
+	voitures[numPid].isOut = 0;
+	voitures[numPid].nbrTour = 0;
+	voitures[numPid].bestTour = 0;
+	voitures[numPid].tempsTotal = 0;
+	
+										/* ************************************
+										Début de la boucle de la séance d'essai
+										************************************ */
+										
+										
+	while(voitures[numPid].isOut == 0 && voitures[numPid].tempsTotal < tempsTotalEssai) {
+		sleep(0.50);
+		voitures[numPid].tempsTour = 0;
+		if(voitures[numPid].isOut == 0) {
+			tempsS1(numPid);	
+			if((voitures[numPid].bestS1 < (double)brain[7]) || ((double)brain[7] < 1)) {
+				semop(SemId, &semPlus, 1);
+				brain[7] = (voitures[numPid].bestS1);
+				semop(SemId, &semMoins, 1);
+			}
+		}
+		
+		if(voitures[numPid].isOut == 0) {
+			tempsS2(numPid);
+			if((voitures[numPid].bestS2 < (double)brain[8]) || ((double)brain[8] < 1)) {
+				semop(SemId, &semPlus, 1);
+				brain[8] = (voitures[numPid].bestS2);
+				semop(SemId, &semMoins, 1);
+			}
+		}
+		
+		if(voitures[numPid].isOut == 0) {
+			int isStand = voitures[numPid].nbrStand;
+			tempsS3(numPid);
+			if(voitures[numPid].nbrStand != isStand) {
+				voitures[numPid].tempsTotal += 5;
+			}
+			if((voitures[numPid].bestS3 < (double)brain[9]) || ((double)brain[9] < 1)) {
+				semop(SemId, &semPlus, 1);
+				brain[9] = (voitures[numPid].bestS3);
+				semop(SemId, &semMoins, 1);
+			}
+		}	
+		if(voitures[numPid].isOut == 0) {
+			if(voitures[numPid].bestTour < 1 || voitures[numPid].tempsTour < voitures[numPid].bestTour) {
+				semop(SemId, &semPlus, 1);
+				voitures[numPid].bestTour = voitures[numPid].tempsTour;
+				semop(SemId, &semMoins, 1);
+				if((voitures[numPid].bestTour < (double)brain[10]) || ((double)brain[10] < 1)) {
+					semop(SemId, &semPlus, 1);
+					brain[10] = (voitures[numPid].bestTour);
+					semop(SemId, &semMoins, 1);
+				}
+			}
+		}
+		if(voitures[numPid].isOut == 0) {
+			voitures[numPid].nbrTour++;
+		}
+	}
+	
+	if(essai == 1) {
+		semop(SemId, &semPlus, 1);
+		brain[0]++;
+		semop(SemId, &semMoins, 1);
+	}
+	if(essai == 2) {
+		semop(SemId, &semPlus, 1);
+		brain[1]++;
+		semop(SemId, &semMoins, 1);
+	}
+	if(essai == 3) {
+		semop(SemId, &semPlus, 1);
+		brain[2]++;
+		semop(SemId, &semMoins, 1);
+	}	
+}
+
+int genererQualif(int qualif, int numPid) {
+		int tempsTotalQualif;
+		voitures[numPid].bestS1 = 0;
+		voitures[numPid].bestS2 = 0;
+		voitures[numPid].bestS3 = 0;
+		voitures[numPid].isOut = 0;
+		voitures[numPid].nbrTour = 0;
+		voitures[numPid].bestTour = 0;
+		voitures[numPid].tempsTotal = 0;
+		
+		if(qualif == 1) {
+			tempsTotalQualif = 1080;	//Temps maximal pour la qualif 1. Ici, 18min
+		}
+		else if(qualif == 2) {
+			tempsTotalQualif = 900;		//Temps maximal pour la qualif 2. Ici, 15min
+			if(voitures[numPid].isQualifiedFor2 == 0) {	//Ejecte de la 2e qualif toutes les voitures non qualifiées
+				return 0;
+			}
+		}
+		else if(qualif == 3) {
+			tempsTotalQualif = 720;		//Temps maximal pour la qualif 3. Ici, 12min
+			if(voitures[numPid].isQualifiedFor3 == 0) {	//Ejecte de la 3e qualif toutes les voitures non qualifiées
+				return 0;
+			}
+		}
+		
+		
+											/* ***********************************
+											Début de la boucle de la qualification
+											*********************************** */
+											
+											
+		while(voitures[numPid].isOut == 0 && voitures[numPid].tempsTotal < tempsTotalQualif) {
+			voitures[numPid].tempsTour = 0;
+			if(voitures[numPid].isOut == 0) {
+				tempsS1(numPid);	
+				if((voitures[numPid].bestS1 < (double)brain[7]) || ((double)brain[7] < 1)) {
+					semop(SemId, &semPlus, 1);
+					brain[7] = (voitures[numPid].bestS1);
+					semop(SemId, &semMoins, 1);
+				}
+			}
+			
+			if(voitures[numPid].isOut == 0) {
+				tempsS2(numPid);
+				if((voitures[numPid].bestS2 < (double)brain[8]) || ((double)brain[8] < 1)) {
+					semop(SemId, &semPlus, 1);
+					brain[8] = (voitures[numPid].bestS2);
+					semop(SemId, &semMoins, 1);
+				}
+			}
+			
+			if(voitures[numPid].isOut == 0) {
+				int isStand = voitures[numPid].nbrStand;
+				tempsS3(numPid);
+				if(voitures[numPid].nbrStand != isStand) {
+					voitures[numPid].tempsTotal += 5;
+				}
+				if((voitures[numPid].bestS3 < (double)brain[9]) || ((double)brain[9] < 1)) {
+					semop(SemId, &semPlus, 1);
+					brain[9] = (voitures[numPid].bestS3);
+					semop(SemId, &semMoins, 1);
+				}
+			}	
+			if(voitures[numPid].isOut == 0) {
+				if(voitures[numPid].bestTour < 1 || voitures[numPid].tempsTour < voitures[numPid].bestTour) {
+					semop(SemId, &semPlus, 1);
+					voitures[numPid].bestTour = voitures[numPid].tempsTour;
+					semop(SemId, &semMoins, 1);
+					if((voitures[numPid].bestTour < (double)brain[10]) || ((double)brain[10] < 1)) {
+						semop(SemId, &semPlus, 1);
+						brain[10] = (voitures[numPid].bestTour);
+						semop(SemId, &semMoins, 1);
+					}
+				}
+			}
+			if(voitures[numPid].isOut == 0) {
+				voitures[numPid].nbrTour++;
+			}
+		}
+			
+		if(qualif == 1) {
+			semop(SemId, &semPlus, 1);
+			brain[3]++;
+			semop(SemId, &semMoins, 1);
+		}
+		if(qualif == 2) {
+			semop(SemId, &semPlus, 1);
+			brain[4]++;
+			semop(SemId, &semMoins, 1);
+		}
+		if(qualif == 3) {
+			semop(SemId, &semPlus, 1);
+			brain[5]++;
+			semop(SemId, &semMoins, 1);
+		}
+}
+
+int genererCourse(int numPid) {
+	int tempsTotalCourse = 7200;	//Temps maximal pour la course. Ici, 2h
+	
+	voitures[numPid].bestS1 = 0;
+	voitures[numPid].bestS2 = 0;
+	voitures[numPid].bestS3 = 0;
+	voitures[numPid].isOut = 0;
+	voitures[numPid].nbrTour = 0;
+	voitures[numPid].bestTour = 0;
+	voitures[numPid].tempsTotal = 0;
+	
+										/* ****************************
+										Début de la boucle de la course
+										**************************** */
+										
+										
+	while(voitures[numPid].isOut == 0 && voitures[numPid].tempsTotal < tempsTotalCourse) {
+		sleep(0.50);
+		voitures[numPid].tempsTour = 0;
+		if(voitures[numPid].isOut == 0) {
+			tempsS1(numPid);	
+			if((voitures[numPid].bestS1 < (double)brain[7]) || ((double)brain[7] < 1)) {
+				semop(SemId, &semPlus, 1);
+				brain[7] = (voitures[numPid].bestS1);
+				semop(SemId, &semMoins, 1);
+			}
+		}
+		
+		if(voitures[numPid].isOut == 0) {
+			tempsS2(numPid);
+			if((voitures[numPid].bestS2 < (double)brain[8]) || ((double)brain[8] < 1)) {
+				semop(SemId, &semPlus, 1);
+				brain[8] = (voitures[numPid].bestS2);
+				semop(SemId, &semMoins, 1);
+			}
+		}
+		
+		if(voitures[numPid].isOut == 0) {
+			int isStand = voitures[numPid].nbrStand;
+			tempsS3(numPid);
+			if(voitures[numPid].nbrStand != isStand) {
+				voitures[numPid].tempsTotal += 5;
+			}
+			if((voitures[numPid].bestS3 < (double)brain[9]) || ((double)brain[9] < 1)) {
+				semop(SemId, &semPlus, 1);
+				brain[9] = (voitures[numPid].bestS3);
+				semop(SemId, &semMoins, 1);
+			}
+		}	
+		if(voitures[numPid].isOut == 0) {
+			if(voitures[numPid].bestTour < 1 || voitures[numPid].tempsTour < voitures[numPid].bestTour) {
+				semop(SemId, &semPlus, 1);
+				voitures[numPid].bestTour = voitures[numPid].tempsTour;
+				semop(SemId, &semMoins, 1);
+				if((voitures[numPid].bestTour < (double)brain[10]) || ((double)brain[10] < 1)) {
+					semop(SemId, &semPlus, 1);
+					brain[10] = (voitures[numPid].bestTour);
+					semop(SemId, &semMoins, 1);
+				}
+			}
+		}
+		if(voitures[numPid].isOut == 0) {
+			voitures[numPid].nbrTour++;
+		}
+	}
+	semop(SemId, &semPlus, 1);
+	brain[6]++;
+	semop(SemId, &semMoins, 1);
 }
